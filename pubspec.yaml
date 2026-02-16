@@ -1,0 +1,88 @@
+name: studybrain
+description: AI-powered study app with flashcards, quizzes, and smart notes
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.5.0 <4.0.0'
+  flutter: ">=3.16.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Firebase
+  firebase_core: ^4.0.0
+  firebase_auth: ^6.0.0
+  cloud_firestore: ^6.0.0
+  firebase_storage: ^13.0.0
+  
+  # Authentication
+  google_sign_in: ^6.2.1
+  
+  # File handling
+  image_picker: ^1.0.4
+  file_picker: ^10.0.0
+  
+  # OCR
+  google_mlkit_text_recognition: ^0.11.0
+  
+  # HTTP and API
+  http: ^1.1.0
+  
+  # State management
+  provider: ^6.1.1
+  
+  # Storage
+  shared_preferences: ^2.2.2
+  
+  # UI and animations
+  flutter_animate: ^4.3.0
+  google_fonts: ^8.0.0
+  cached_network_image: ^3.3.0
+  
+  # Utilities
+  intl: ^0.19.0
+  
+  # Charts
+  fl_chart: ^1.0.0
+  
+  # Card swiper for flashcards
+  flutter_card_swiper: ^6.0.0
+  
+  # Chat UI
+  dash_chat_2: ^0.0.21
+  
+  # Grid layouts
+  flutter_staggered_grid_view: ^0.7.0
+  
+  # Slidable list items
+  flutter_slidable: ^4.0.0
+  
+  # Confetti animation
+  confetti: ^0.8.0
+  
+  # Markdown rendering
+  flutter_markdown: ^0.7.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  
+  assets:
+    - assets/images/
+    - assets/icons/
+  
+  fonts:
+    - family: Poppins
+      fonts:
+        - asset: assets/fonts/Poppins-Regular.ttf
+        - asset: assets/fonts/Poppins-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Poppins-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Poppins-Bold.ttf
+          weight: 700
