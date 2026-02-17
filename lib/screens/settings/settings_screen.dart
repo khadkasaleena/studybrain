@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../config/theme.dart';
 import '../../config/constants.dart';
+import '../../services/theme_service.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -51,12 +53,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _loadSettings() {
-    // Load settings from SharedPreferences - mock data for now
+    // Load settings from ThemeService and SharedPreferences
+    final themeService = Provider.of<ThemeService>(context, listen: false);
     setState(() {
-      _darkMode = false;
+      _darkMode = themeService.isDarkMode;
       _notifications = true;
       _studyReminders = true;
-      _selectedThemeColor = 'purple';
+      _selectedThemeColor = themeService.selectedColor;
       _reminderTime = const TimeOfDay(hour: 9, minute: 0);
       _selectedModel = 'gpt-3.5-turbo';
     });
@@ -459,18 +462,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ],
           ),
           const SizedBox(height: 16),
-          Wrap(
-            spacing: 12,
-            runSpacing: 12,
-            children: _themeColors.map((colorData) {
-              final isSelected = _selectedThemeColor == colorData['name'];
-              return GestureDetector(
-                onTap: () {
-                  setState(() {
-                    _selectedThemeColor = colorData['name'];
-                  });
-                  _saveSettings();
-                },
+          Consumer<ThemeService>(
+            builder: (context, themeService, child) {
+              return Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                children: _themeColors.map((colorData) {
+                  final isSelected = themeService.selectedColor == colorData['name'];
+                  return GestureDetector(
+                    onTap: () {
+                      themeService.setThemeColor(colorData['name']);
+                    },
                 child: Container(
                   width: 50,
                   height: 50,
@@ -498,8 +500,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         )
                       : null,
                 ),
-              ).animate().scale(delay: Duration(milliseconds: _themeColors.indexOf(colorData) * 100));
-            }).toList(),
+                  ).animate().scale(delay: Duration(milliseconds: _themeColors.indexOf(colorData) * 100));
+                }).toList(),
+              );
+            },
           ),
         ],
       ),
@@ -629,16 +633,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
             
             // Appearance Section
             _buildSectionTitle('🎨 Appearance'),
-            _buildSwitchTile(
-              icon: Icons.dark_mode,
-              title: 'Dark Mode',
-              subtitle: 'Toggle dark theme',
-              value: _darkMode,
-              onChanged: (value) {
-                setState(() {
-                  _darkMode = value;
-                });
-                _saveSettings();
+            Consumer<ThemeService>(
+              builder: (context, themeService, child) {
+                return _buildSwitchTile(
+                  icon: Icons.dark_mode,
+                  title: 'Dark Mode',
+                  subtitle: 'Toggle dark theme',
+                  value: themeService.isDarkMode,
+                  onChanged: (value) {
+                    themeService.setDarkMode(value);
+                  },
+                );
               },
             ),
             _buildThemeColorPicker(),

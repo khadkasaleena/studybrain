@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'config/theme.dart';
 import 'config/routes.dart';
 import 'services/auth_service.dart';
+import 'services/theme_service.dart';
 import 'screens/splash_screen.dart';
 import 'screens/onboarding/onboarding_screen.dart';
 import 'screens/auth/login_screen.dart';
@@ -27,11 +28,15 @@ class StudyBrainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'StudyBrain',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme,
-      initialRoute: AppRoutes.splash,
+    return Consumer<ThemeService>(
+      builder: (context, themeService, child) {
+        return MaterialApp(
+          title: 'StudyBrain',
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode: themeService.isDarkMode ? ThemeMode.dark : ThemeMode.light,
+          initialRoute: AppRoutes.splash,
       onGenerateRoute: (settings) {
         switch (settings.name) {
           case AppRoutes.splash:
@@ -87,11 +92,13 @@ class StudyBrainApp extends StatelessWidget {
             return MaterialPageRoute(builder: (_) => const SplashScreen());
         }
       },
-      builder: (context, child) {
-        return Consumer<AuthService>(
-          builder: (context, auth, _) {
-            // Auto navigation based on auth state is handled in SplashScreen
-            return child!;
+          builder: (context, child) {
+            return Consumer<AuthService>(
+              builder: (context, auth, _) {
+                // Auto navigation based on auth state is handled in SplashScreen
+                return child!;
+              },
+            );
           },
         );
       },
