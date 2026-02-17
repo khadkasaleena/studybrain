@@ -627,14 +627,194 @@ class HomeDashboard extends StatelessWidget {
   }
 }
 
-// Placeholder pages for bottom navigation
+// Implemented pages for bottom navigation
 class NotebooksPage extends StatelessWidget {
   const NotebooksPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Text('Notebooks Page - Will be implemented'),
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'My Notebooks',
+                  style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.darkTextColor,
+                  ),
+                ),
+                FloatingActionButton.small(
+                  onPressed: () => _showCreateNotebookDialog(context),
+                  child: const Icon(Icons.add),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+            Expanded(
+              child: Consumer<AuthService>(
+                builder: (context, authService, child) {
+                  if (authService.user == null) {
+                    return const Center(child: Text('Please log in'));
+                  }
+                  
+                  return Consumer<FirestoreService>(
+                    builder: (context, firestoreService, child) {
+                      return StreamBuilder<List<NotebookModel>>(
+                        stream: firestoreService.getUserNotebooks(authService.user!.uid),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return const Center(child: CircularProgressIndicator());
+                          }
+
+                          if (snapshot.hasError) {
+                            return Center(
+                              child: Text('Error: ${snapshot.error}'),
+                            );
+                          }
+
+                          final notebooks = snapshot.data ?? [];
+
+                          if (notebooks.isEmpty) {
+                            return _buildEmptyState(context);
+                          }
+
+                          return GridView.builder(
+                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 16,
+                              mainAxisSpacing: 16,
+                              childAspectRatio: 0.8,
+                            ),
+                            itemCount: notebooks.length,
+                            itemBuilder: (context, index) {
+                              return NotebookCard(notebook: notebooks[index]);
+                            },
+                          );
+                        },
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.book_outlined,
+            size: 64,
+            color: AppTheme.lightTextColor,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'No notebooks yet',
+            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+              color: AppTheme.darkTextColor,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Create your first notebook to start organizing your notes',
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+              color: AppTheme.lightTextColor,
+            ),
+          ),
+          const SizedBox(height: 24),
+          ElevatedButton.icon(
+            onPressed: () => _showCreateNotebookDialog(context),
+            icon: const Icon(Icons.add),
+            label: const Text('Create Notebook'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showCreateNotebookDialog(BuildContext context) {
+    final titleController = TextEditingController();
+    final descriptionController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Create Notebook'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: titleController,
+              decoration: const InputDecoration(
+                labelText: 'Notebook Title',
+                hintText: 'Enter a title for your notebook',
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: descriptionController,
+              decoration: const InputDecoration(
+                labelText: 'Description (Optional)',
+                hintText: 'What will you study in this notebook?',
+              ),
+              maxLines: 3,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              if (titleController.text.trim().isNotEmpty) {
+                final authService = Provider.of<AuthService>(context, listen: false);
+                final firestoreService = Provider.of<FirestoreService>(context, listen: false);
+                
+                final notebook = NotebookModel(
+                  id: '',
+                  title: titleController.text.trim(),
+                  description: descriptionController.text.trim(),
+                  userId: authService.user!.uid,
+                  createdAt: DateTime.now(),
+                  updatedAt: DateTime.now(),
+                );
+
+                try {
+                  await firestoreService.createNotebook(notebook);
+                  if (context.mounted) {
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Notebook created successfully!')),
+                    );
+                  }
+                } catch (e) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Error creating notebook: $e')),
+                    );
+                  }
+                }
+              }
+            },
+            child: const Text('Create'),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -644,8 +824,200 @@ class ProgressPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Text('Progress Page - Will be implemented'),
+    return SafeArea(
+      child: Consumer<AuthService>(
+        builder: (context, authService, child) {
+          if (authService.user == null) {
+            return const Center(child: Text('Please log in'));
+          }
+
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Study Progress',
+                  style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.darkTextColor,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                
+                // Study Streak Card
+                _buildStreakCard(context, authService),
+                const SizedBox(height: 24),
+                
+                // Statistics Cards
+                Consumer<FirestoreService>(
+                  builder: (context, firestoreService, child) {
+                    return FutureBuilder<Map<String, int>>(
+                      future: firestoreService.getUserStats(authService.user!.uid),
+                      builder: (context, snapshot) {
+                        final stats = snapshot.data ?? {
+                          'notebooks': 0,
+                          'notes': 0,
+                          'flashcards': 0,
+                          'quizzes': 0,
+                        };
+                        
+                        return Column(
+                          children: [
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: _buildStatCard(
+                                    context,
+                                    'Notebooks',
+                                    stats['notebooks'].toString(),
+                                    Icons.book_outlined,
+                                    AppTheme.primaryColor,
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: _buildStatCard(
+                                    context,
+                                    'Notes',
+                                    stats['notes'].toString(),
+                                    Icons.note_outlined,
+                                    AppTheme.secondaryColor,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: _buildStatCard(
+                                    context,
+                                    'Flashcards',
+                                    stats['flashcards'].toString(),
+                                    Icons.style_outlined,
+                                    Colors.orange,
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: _buildStatCard(
+                                    context,
+                                    'Quizzes',
+                                    stats['quizzes'].toString(),
+                                    Icons.quiz_outlined,
+                                    Colors.teal,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildStreakCard(BuildContext context, AuthService authService) {
+    final streak = authService.userModel?.studyStreak ?? 0;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: AppTheme.primaryGradient,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: AppTheme.cardShadow,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.local_fire_department_rounded,
+                color: Colors.white,
+                size: 32,
+              ),
+              const SizedBox(width: 12),
+              Text(
+                'Study Streak',
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Text(
+            '$streak ${streak == 1 ? 'Day' : 'Days'}',
+            style: Theme.of(context).textTheme.displayMedium?.copyWith(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            streak > 0 
+                ? 'Great job! Keep up the consistency! 🎉'
+                : 'Start studying today to begin your streak! 🚀',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: Colors.white.withOpacity(0.9),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatCard(BuildContext context, String title, String value, IconData icon, Color color) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceColor,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: AppTheme.cardShadow,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(icon, color: color, size: 20),
+              ),
+              const Spacer(),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Text(
+            value,
+            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: AppTheme.darkTextColor,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            title,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: AppTheme.lightTextColor,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -655,8 +1027,298 @@ class SettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Text('Settings Page - Will be implemented'),
+    return SafeArea(
+      child: Consumer<AuthService>(
+        builder: (context, authService, child) {
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Settings',
+                  style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.darkTextColor,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                
+                // Profile Section
+                _buildProfileSection(context, authService),
+                const SizedBox(height: 32),
+                
+                // AI Configuration Section
+                _buildAIConfigSection(context),
+                const SizedBox(height: 32),
+                
+                // App Settings Section
+                _buildAppSettingsSection(context),
+                const SizedBox(height: 32),
+                
+                // Danger Zone
+                _buildDangerZone(context, authService),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildProfileSection(BuildContext context, AuthService authService) {
+    final user = authService.userModel;
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Profile',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                CircleAvatar(
+                  radius: 30,
+                  backgroundColor: AppTheme.primaryColor.withOpacity(0.1),
+                  backgroundImage: user?.profileImageUrl != null 
+                      ? NetworkImage(user!.profileImageUrl!) 
+                      : null,
+                  child: user?.profileImageUrl == null 
+                      ? Icon(Icons.person, size: 30, color: AppTheme.primaryColor)
+                      : null,
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        user?.name ?? 'User Name',
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        user?.email ?? 'user@email.com',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: AppTheme.lightTextColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  onPressed: () {
+                    // TODO: Implement profile editing
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Profile editing coming soon!')),
+                    );
+                  },
+                  icon: const Icon(Icons.edit),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAIConfigSection(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'AI Configuration',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Consumer<AiService>(
+              builder: (context, aiService, child) {
+                return Column(
+                  children: [
+                    ListTile(
+                      leading: Icon(
+                        aiService.isConfigured 
+                            ? Icons.check_circle 
+                            : Icons.error_outline,
+                        color: aiService.isConfigured 
+                            ? AppTheme.successColor 
+                            : AppTheme.errorColor,
+                      ),
+                      title: const Text('AI Service Status'),
+                      subtitle: Text(
+                        aiService.isConfigured 
+                            ? 'Connected and ready' 
+                            : 'Not configured',
+                      ),
+                      trailing: TextButton(
+                        onPressed: () => _showAIConfigDialog(context),
+                        child: const Text('Configure'),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAppSettingsSection(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'App Settings',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            ListTile(
+              leading: const Icon(Icons.notifications_outlined),
+              title: const Text('Notifications'),
+              subtitle: const Text('Study reminders and updates'),
+              trailing: Switch(
+                value: true, // TODO: Implement actual toggle
+                onChanged: (value) {
+                  // TODO: Implement notification settings
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Notification settings coming soon!')),
+                  );
+                },
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.dark_mode_outlined),
+              title: const Text('Dark Mode'),
+              subtitle: const Text('Switch to dark theme'),
+              trailing: Switch(
+                value: false, // TODO: Implement actual toggle
+                onChanged: (value) {
+                  // TODO: Implement dark mode
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Dark mode coming soon!')),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDangerZone(BuildContext context, AuthService authService) {
+    return Card(
+      color: AppTheme.errorColor.withOpacity(0.05),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Danger Zone',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: AppTheme.errorColor,
+              ),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () async {
+                  await authService.signOut();
+                  if (context.mounted) {
+                    Navigator.of(context).pushReplacementNamed(AppRoutes.login);
+                  }
+                },
+                icon: const Icon(Icons.logout),
+                label: const Text('Sign Out'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppTheme.errorColor,
+                  side: BorderSide(color: AppTheme.errorColor),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showAIConfigDialog(BuildContext context) {
+    final apiKeyController = TextEditingController();
+    
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Configure AI Service'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'The app is pre-configured with Groq AI. You can update the API key if needed.',
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: apiKeyController,
+              decoration: const InputDecoration(
+                labelText: 'Groq API Key',
+                hintText: 'gsk_...',
+              ),
+              obscureText: true,
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Current key: configured via settings',
+              style: TextStyle(fontSize: 12, fontFamily: 'monospace'),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              final aiService = Provider.of<AiService>(context, listen: false);
+              final apiKey = apiKeyController.text.trim();
+              
+              if (apiKey.isNotEmpty) {
+                await aiService.saveConfiguration(apiKey: apiKey);
+                if (context.mounted) {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('AI configuration updated!')),
+                  );
+                }
+              }
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      ),
     );
   }
 }

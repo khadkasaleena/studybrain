@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:google_fonts/google_fonts.dart';
+// import 'package:google_fonts/google_fonts.dart'; // Removed - using system fonts
 import '../../config/theme.dart';
 import '../../config/constants.dart';
 import '../../models/notebook_model.dart';
@@ -194,7 +194,7 @@ class _NotebooksScreenState extends State<NotebooksScreen>
                     Expanded(
                       child: Text(
                         'Create New Notebook',
-                        style: GoogleFonts.poppins(
+                        style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                           color: AppTheme.darkTextColor,
@@ -235,7 +235,7 @@ class _NotebooksScreenState extends State<NotebooksScreen>
                 // Color picker
                 Text(
                   'Choose Color',
-                  style: GoogleFonts.inter(
+                  style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                     color: AppTheme.darkTextColor,
@@ -273,7 +273,7 @@ class _NotebooksScreenState extends State<NotebooksScreen>
                 // Icon picker
                 Text(
                   'Choose Icon',
-                  style: GoogleFonts.inter(
+                  style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                     color: AppTheme.darkTextColor,
@@ -414,7 +414,7 @@ class _NotebooksScreenState extends State<NotebooksScreen>
           children: [
             Text(
               'Sort Notebooks',
-              style: GoogleFonts.poppins(
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
               ),
@@ -504,7 +504,7 @@ class _NotebooksScreenState extends State<NotebooksScreen>
                       Expanded(
                         child: Text(
                           'My Notebooks',
-                          style: GoogleFonts.poppins(
+                          style: const TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.bold,
                             color: AppTheme.darkTextColor,
@@ -575,7 +575,7 @@ class _NotebooksScreenState extends State<NotebooksScreen>
                         const SizedBox(height: 16),
                         Text(
                           'Loading your notebooks...',
-                          style: GoogleFonts.inter(
+                          style: const TextStyle(
                             fontSize: 16,
                             color: AppTheme.lightTextColor,
                           ),
@@ -613,7 +613,7 @@ class _NotebooksScreenState extends State<NotebooksScreen>
                         _searchController.text.isEmpty 
                           ? 'No notebooks yet' 
                           : 'No notebooks found',
-                        style: GoogleFonts.poppins(
+                        style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w600,
                           color: AppTheme.darkTextColor,
@@ -624,7 +624,7 @@ class _NotebooksScreenState extends State<NotebooksScreen>
                         _searchController.text.isEmpty
                           ? 'Create your first notebook to get started'
                           : 'Try adjusting your search terms',
-                        style: GoogleFonts.inter(
+                        style: const TextStyle(
                           fontSize: 16,
                           color: AppTheme.lightTextColor,
                         ),
@@ -713,7 +713,7 @@ class _NotebooksScreenState extends State<NotebooksScreen>
                               const SizedBox(height: 16),
                               Text(
                                 notebook.title,
-                                style: GoogleFonts.poppins(
+                                style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
                                   color: AppTheme.darkTextColor,
@@ -725,7 +725,7 @@ class _NotebooksScreenState extends State<NotebooksScreen>
                                 const SizedBox(height: 8),
                                 Text(
                                   notebook.description,
-                                  style: GoogleFonts.inter(
+                                  style: const TextStyle(
                                     fontSize: 12,
                                     color: AppTheme.lightTextColor,
                                   ),
@@ -744,7 +744,7 @@ class _NotebooksScreenState extends State<NotebooksScreen>
                                   const SizedBox(width: 4),
                                   Text(
                                     notebook.notesCountText,
-                                    style: GoogleFonts.inter(
+                                    style: const TextStyle(
                                       fontSize: 12,
                                       color: AppTheme.lightTextColor,
                                     ),
@@ -752,7 +752,7 @@ class _NotebooksScreenState extends State<NotebooksScreen>
                                   const Spacer(),
                                   Text(
                                     notebook.formattedCreatedDate,
-                                    style: GoogleFonts.inter(
+                                    style: const TextStyle(
                                       fontSize: 10,
                                       color: AppTheme.lightTextColor,
                                     ),

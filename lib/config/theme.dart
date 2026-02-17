@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
   // Brand Colors
@@ -40,63 +39,63 @@ class AppTheme {
       ),
       
       // Typography
-      textTheme: GoogleFonts.interTextTheme().copyWith(
-        displayLarge: GoogleFonts.poppins(
+      textTheme: const TextTheme(
+        displayLarge: TextStyle(
           fontSize: 32,
           fontWeight: FontWeight.bold,
           color: darkTextColor,
         ),
-        displayMedium: GoogleFonts.poppins(
+        displayMedium: TextStyle(
           fontSize: 28,
           fontWeight: FontWeight.bold,
           color: darkTextColor,
         ),
-        displaySmall: GoogleFonts.poppins(
+        displaySmall: TextStyle(
           fontSize: 24,
           fontWeight: FontWeight.w600,
           color: darkTextColor,
         ),
-        headlineLarge: GoogleFonts.poppins(
+        headlineLarge: TextStyle(
           fontSize: 22,
           fontWeight: FontWeight.w600,
           color: darkTextColor,
         ),
-        headlineMedium: GoogleFonts.poppins(
+        headlineMedium: TextStyle(
           fontSize: 20,
           fontWeight: FontWeight.w600,
           color: darkTextColor,
         ),
-        headlineSmall: GoogleFonts.poppins(
+        headlineSmall: TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.w500,
           color: darkTextColor,
         ),
-        titleLarge: GoogleFonts.inter(
+        titleLarge: TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.w500,
           color: darkTextColor,
         ),
-        titleMedium: GoogleFonts.inter(
+        titleMedium: TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w500,
           color: darkTextColor,
         ),
-        titleSmall: GoogleFonts.inter(
+        titleSmall: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w500,
           color: lightTextColor,
         ),
-        bodyLarge: GoogleFonts.inter(
+        bodyLarge: TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.normal,
           color: darkTextColor,
         ),
-        bodyMedium: GoogleFonts.inter(
+        bodyMedium: TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.normal,
           color: darkTextColor,
         ),
-        bodySmall: GoogleFonts.inter(
+        bodySmall: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.normal,
           color: lightTextColor,
@@ -109,7 +108,7 @@ class AppTheme {
         foregroundColor: darkTextColor,
         elevation: 0,
         centerTitle: true,
-        titleTextStyle: GoogleFonts.poppins(
+        titleTextStyle: const TextStyle(
           fontSize: 20,
           fontWeight: FontWeight.w600,
           color: darkTextColor,
@@ -155,7 +154,7 @@ class AppTheme {
             borderRadius: BorderRadius.circular(12),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-          textStyle: GoogleFonts.inter(
+          textStyle: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
           ),
@@ -171,7 +170,7 @@ class AppTheme {
             borderRadius: BorderRadius.circular(12),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-          textStyle: GoogleFonts.inter(
+          textStyle: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
           ),
@@ -183,7 +182,7 @@ class AppTheme {
         style: TextButton.styleFrom(
           foregroundColor: primaryColor,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          textStyle: GoogleFonts.inter(
+          textStyle: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w600,
           ),
@@ -211,11 +210,11 @@ class AppTheme {
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: errorColor, width: 2),
         ),
-        labelStyle: GoogleFonts.inter(
+        labelStyle: const TextStyle(
           fontSize: 14,
           color: lightTextColor,
         ),
-        hintStyle: GoogleFonts.inter(
+        hintStyle: const TextStyle(
           fontSize: 14,
           color: lightTextColor,
         ),
@@ -243,7 +242,7 @@ class AppTheme {
       chipTheme: ChipThemeData(
         backgroundColor: backgroundColor,
         selectedColor: primaryColor,
-        labelStyle: GoogleFonts.inter(
+        labelStyle: const TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w500,
         ),

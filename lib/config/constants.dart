@@ -8,10 +8,11 @@ class AppConstants {
   static const String usersCollection = 'users';
   static const String notebooksCollection = 'notebooks';
 
-  // AI
+  // AI (Groq - free tier)
+  // API key loaded from --dart-define=GROQ_API_KEY=your_key or .env
   static const String groqApiKey = String.fromEnvironment('GROQ_API_KEY');
   static const String groqBaseUrl = 'https://api.groq.com/openai/v1';
-  static const String aiModel = 'llama-3.1-8b-instant';
+  static const String aiModel = 'llama-3.3-70b-versatile';
   static const String notesCollection = 'notes';
   static const String flashcardsCollection = 'flashcards';
   static const String quizzesCollection = 'quizzes';
@@ -30,11 +31,11 @@ class AppConstants {
   static const String darkModeKey = 'dark_mode';
   static const String notificationsKey = 'notifications';
 
-  // AI Configuration
-  static const String defaultApiUrl = 'https://api.openai.com/v1';
+  // AI Configuration (defaults to Groq)
+  static const String defaultApiUrl = 'https://api.groq.com/openai/v1';
   static const String apiKeyKey = 'ai_api_key';
   static const String apiUrlKey = 'ai_api_url';
-  static const String defaultModel = 'gpt-3.5-turbo';
+  static const String defaultModel = 'llama-3.3-70b-versatile';
 
   // Study Configuration
   static const int maxFlashcardsPerSession = 20;
